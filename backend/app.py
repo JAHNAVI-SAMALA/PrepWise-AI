@@ -31,14 +31,15 @@ def health():
     return jsonify({"message": "PrepWise AI Backend Running"})
 
 
-# Serve React frontend for all non-API routes
+frontend_folder = os.path.join(os.getcwd(), "frontend", "dist")
+
 @app.get("/", defaults={"path": ""})
 @app.get("/<path:path>")
 def serve_frontend(path):
-    # API routes are handled above — this catches everything else
-    if path and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    return send_from_directory(app.static_folder, "index.html")
+    if path and os.path.exists(os.path.join(frontend_folder, path)):
+        return send_from_directory(frontend_folder, path)
+
+    return send_from_directory(frontend_folder, "index.html")
 
 
 @app.post("/upload_resume")
@@ -165,20 +166,6 @@ def report():
     result = ReportGenerator(agent.state).generate()
     return jsonify(result)
 
-frontend_folder = os.path.join(os.getcwd(), "frontend", "dist")
 
-@app.route("/")
-def serve_frontend():
-    return send_from_directory(frontend_folder, "index.html")
-
-
-@app.route("/<path:path>")
-def serve_react(path):
-    file_path = os.path.join(frontend_folder, path)
-
-    if os.path.exists(file_path):
-        return send_from_directory(frontend_folder, path)
-
-    return send_from_directory(frontend_folder, "index.html")
 if __name__ == "__main__":
     app.run(debug=True)
