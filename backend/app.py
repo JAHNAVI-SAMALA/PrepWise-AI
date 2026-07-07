@@ -8,7 +8,7 @@ from backend.resume_analyzer import analyze_resume
 from backend.interview_agent import InterviewAgent
 from backend.report_generator import ReportGenerator
 
-app = Flask(__name__, static_folder="frontend/dist", static_url_path="")
+app = Flask(__name__, static_folder=None)
 CORS(app)
 
 UPLOAD_FOLDER = "uploads"
@@ -31,7 +31,7 @@ def health():
     return jsonify({"message": "PrepWise AI Backend Running"})
 
 
-frontend_folder = os.path.join(os.getcwd(), "frontend", "dist")
+frontend_folder = os.path.abspath(os.path.join(app.root_path, "..", "frontend", "dist"))
 
 @app.get("/", defaults={"path": ""})
 @app.get("/<path:path>")
