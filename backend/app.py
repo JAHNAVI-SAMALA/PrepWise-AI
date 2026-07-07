@@ -165,12 +165,20 @@ def report():
     result = ReportGenerator(agent.state).generate()
     return jsonify(result)
 
+frontend_folder = os.path.join(os.getcwd(), "frontend", "dist")
+
+@app.route("/")
+def serve_frontend():
+    return send_from_directory(frontend_folder, "index.html")
+
+
 @app.route("/<path:path>")
-def serve_static(path):
-    file_path = f"frontend/dist/{path}"
-    try:
-        return send_from_directory("frontend/dist", path)
-    except:
-        return send_from_directory("frontend/dist", "index.html")
+def serve_react(path):
+    file_path = os.path.join(frontend_folder, path)
+
+    if os.path.exists(file_path):
+        return send_from_directory(frontend_folder, path)
+
+    return send_from_directory(frontend_folder, "index.html")
 if __name__ == "__main__":
     app.run(debug=True)
