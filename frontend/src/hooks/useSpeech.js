@@ -70,7 +70,7 @@ export function useSpeech() {
 
     // ── STT ───────────────────────────────────────────────────────────────
 
-    const startListening = useCallback((onTranscript) => {
+    const startListening = useCallback((onTranscript, onError) => {
         if (!supported.stt) return;
 
         const SpeechRecognition =
@@ -81,27 +81,27 @@ export function useSpeech() {
         recognition.continuous = true;
         recognition.interimResults = true;
 
-        let finalTranscript = "";
-
         recognition.onstart = () => setIsListening(true);
 
         recognition.onresult = (event) => {
+            let localFinal = "";
             let interim = "";
-            for (let i = event.resultIndex; i < event.results.length; i++) {
+            for (let i = 0; i < event.results.length; i++) {
                 const transcript = event.results[i][0].transcript;
                 if (event.results[i].isFinal) {
-                    finalTranscript += transcript + " ";
+                    localFinal += transcript + " ";
                 } else {
                     interim += transcript;
                 }
             }
             // Pass combined text back so textarea updates live
-            onTranscript(finalTranscript + interim);
+            onTranscript(localFinal + interim);
         };
 
         recognition.onerror = (e) => {
             console.error("[STT] Error:", e.error);
             setIsListening(false);
+            if (onError) onError(e.error);
         };
 
         recognition.onend = () => {

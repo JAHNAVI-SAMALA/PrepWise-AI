@@ -78,9 +78,20 @@ function Interview() {
             stopSpeaking();
             // Remember current typed text so we append to it
             baseAnswerRef.current = answer;
-            startListening((transcript) => {
-                setAnswer(baseAnswerRef.current + transcript);
-            });
+            startListening(
+                (transcript) => {
+                    setAnswer(baseAnswerRef.current + transcript);
+                },
+                (error) => {
+                    if (error === "not-allowed") {
+                        alert("Microphone permission was denied. Please enable microphone access in your browser's address bar/settings and try again.");
+                    } else if (error === "no-speech") {
+                        console.warn("No speech was detected.");
+                    } else {
+                        alert(`Speech recognition error: ${error}`);
+                    }
+                }
+            );
         }
     };
 
