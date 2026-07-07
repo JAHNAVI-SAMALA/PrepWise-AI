@@ -165,10 +165,6 @@ def report():
     result = ReportGenerator(agent.state).generate()
     return jsonify(result)
 
-@app.route("/")
-def serve_frontend():
-    return send_from_directory("frontend/dist", "index.html")
-
 @app.route("/<path:path>")
 def serve_static(path):
     file_path = f"frontend/dist/{path}"
