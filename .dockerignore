@@ -1,0 +1,17 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.git/
+.gitignore
+node_modules/
+frontend/node_modules/
+frontend/.vite/
+uploads/
+logs/
+*.log
+*.md
+knowledge_base/
+pages/
