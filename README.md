@@ -1,6 +1,6 @@
 # PrepWise AI
 
-An AI-powered mock interview platform. Upload your resume, pick a role, and get a personalised interview with real-time question generation, answer evaluation, and a full performance report — all powered by IBM WatsonX.
+An AI-powered mock interview platform. Upload your resume, pick a role, and get a personalised interview with real-time question generation, answer evaluation, and a full performance report — all powered by IBM WatsonX and IBM Bob.
 
 ---
 
@@ -65,7 +65,32 @@ PrepWise AI/
 ```
 
 ---
+## 📸 Demo Screenshots
 
+### 🏠 Home
+![Home](assets/home.png)
+
+### ✨ Features
+![Features](assets/features.png)
+
+### 📄 Resume Upload
+![Resume Upload](assets/upload.png)
+
+### 🎤 AI Interview
+![AI Interview](assets/interview.png)
+
+### 📊 Interview Report
+![Interview Report](assets/report.png)
+
+### 💬 AI Feedback
+![AI Feedback](assets/feedback.png)
+
+---
+## 🌐 Live Demo
+
+[![Live Demo](https://img.shields.io/badge/🚀-Live_Demo-blue?style=for-the-badge)](https://prepwise-ai-0afn.onrender.com/)
+
+---
 ## Local Development
 
 ### Prerequisites
