@@ -68,22 +68,22 @@ PrepWise AI/
 ## 📸 Demo Screenshots
 
 ### 🏠 Home
-![Home](assets/home.png)
+![Home](uploads/home.png)
 
 ### ✨ Features
-![Features](assets/features.png)
+![Features](uploads/features.png)
 
 ### 📄 Resume Upload
-![Resume Upload](assets/upload.png)
+![Resume Upload](uploads/upload.png)
 
 ### 🎤 AI Interview
-![AI Interview](assets/interview.png)
+![AI Interview](uploads/interview.png)
 
 ### 📊 Interview Report
-![Interview Report](assets/report.png)
+![Interview Report](uploads/report.png)
 
 ### 💬 AI Feedback
-![AI Feedback](assets/feedback.png)
+![AI Feedback](uploads/feedback.png)
 
 ---
 ## 🌐 Live Demo
