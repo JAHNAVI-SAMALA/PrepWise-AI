@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { BrainCircuit, Clock, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import api from "../services/api";
@@ -33,7 +33,7 @@ function Interview() {
 
     // ── Fetch question ──────────────────────────────────────────────────
 
-    const fetchQuestion = async () => {
+    const fetchQuestion = useCallback(async () => {
         setLoading(true);
         setFetchError(false);
         stopListening();
@@ -62,11 +62,11 @@ function Interview() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [stopListening, stopSpeaking, speak, navigate]);
 
     useEffect(() => {
         fetchQuestion();
-    }, []);
+    }, [fetchQuestion]);
 
     // ── Mic toggle ──────────────────────────────────────────────────────
 

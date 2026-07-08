@@ -1,6 +1,7 @@
 import json
 
 from backend.watsonx_client import ask_llm
+from backend.json_utils import parse_llm_json
 
 
 def choose_next_topic(state):
@@ -12,7 +13,8 @@ def choose_next_topic(state):
 You are an interview planner.
 
 Resume Skills:
-{state.profile["skills"]}
+{", ".join(state.profile.get("skills", []))}
+
 
 Strengths:
 {state.strengths}
@@ -37,11 +39,9 @@ Return JSON only.
 
     response = ask_llm(prompt)
 
-    response = response.replace("```json", "").replace("```", "").strip()
-
     try:
-        result = json.loads(response)
+        result = parse_llm_json(response)
         return result
-    except json.JSONDecodeError:
+    except Exception:
         # LLM returned malformed JSON — fall back to the first remaining topic
         return None

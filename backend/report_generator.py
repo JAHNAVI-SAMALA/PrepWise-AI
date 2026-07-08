@@ -15,7 +15,7 @@ class ReportGenerator:
 
         report = {
             "candidate": self.state.profile.get("name", "Unknown"),
-            "role": self.state.plan["role"],
+            "role": self.state.plan.get("role", "Software Engineer"),
 
             "technical_score": round(mean(stats["technical"]), 2) if stats["technical"] else 0,
 

@@ -21,6 +21,10 @@ class InterviewAgent:
 
     def get_next_question(self):
 
+        # If there is already an active question that hasn't been answered, return it
+        if self.current_question is not None:
+            return self.current_question
+
         # ---------- FOLLOW-UP ----------
         if self.state.follow_up_mode:
 
@@ -142,6 +146,9 @@ class InterviewAgent:
 
             self.state.remaining_topics = []
             self.state.current_topic = None
+
+        # Clear the current question to prevent double submission
+        self.current_question = None
 
         return {
             "evaluation": evaluation,

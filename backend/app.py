@@ -3,6 +3,7 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import os
 import uuid
+import pickle
 
 from backend.resume_analyzer import analyze_resume
 from backend.interview_agent import InterviewAgent
@@ -14,8 +15,31 @@ CORS(app)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# session_id -> { "agent": InterviewAgent, "resume_path": str }
-sessions = {}
+SESSIONS_FOLDER = "sessions"
+os.makedirs(SESSIONS_FOLDER, exist_ok=True)
+
+
+def get_session_data(sid):
+    """Load session dictionary from file."""
+    session_file = os.path.join(SESSIONS_FOLDER, f"{sid}.pkl")
+    if os.path.exists(session_file):
+        try:
+            with open(session_file, "rb") as f:
+                return pickle.load(f)
+        except Exception as e:
+            print(f"[session] Error loading session {sid}: {e}")
+    return {}
+
+
+def save_session_data(sid, data):
+    """Save session dictionary to file."""
+    session_file = os.path.join(SESSIONS_FOLDER, f"{sid}.pkl")
+    try:
+        with open(session_file, "wb") as f:
+            pickle.dump(data, f)
+    except Exception as e:
+        print(f"[session] Error saving session {sid}: {e}")
+
 
 
 def get_session_id():
@@ -58,7 +82,9 @@ def upload_resume():
     file.save(filepath)
 
     sid = get_session_id()
-    sessions.setdefault(sid, {})["resume_path"] = filepath
+    session_data = get_session_data(sid)
+    session_data["resume_path"] = filepath
+    save_session_data(sid, session_data)
 
     try:
         profile = analyze_resume(filepath)
@@ -78,8 +104,8 @@ def upload_resume():
 def start_interview():
 
     sid = get_session_id()
-    data_store = sessions.get(sid, {})
-    resume_path = data_store.get("resume_path")
+    session_data = get_session_data(sid)
+    resume_path = session_data.get("resume_path")
 
     if resume_path is None:
         return jsonify({"error": "Please upload a resume first."}), 400
@@ -87,8 +113,14 @@ def start_interview():
     data = request.get_json()
     role = data.get("role", "Software Engineer")
 
-    agent = InterviewAgent(resume_path, role)
-    sessions[sid]["agent"] = agent
+    try:
+        agent = InterviewAgent(resume_path, role)
+    except Exception as e:
+        print(f"[start_interview] Failed to initialize agent: {e}")
+        return jsonify({"error": "Failed to start interview. Please try again."}), 500
+
+    session_data["agent"] = agent
+    save_session_data(sid, session_data)
 
     total_questions = sum(
         t.get("questions", 1)
@@ -106,13 +138,15 @@ def start_interview():
 def next_question():
 
     sid = get_session_id()
-    agent = sessions.get(sid, {}).get("agent")
+    session_data = get_session_data(sid)
+    agent = session_data.get("agent")
 
     if agent is None:
         return jsonify({"error": "Interview has not been started."}), 400
 
     try:
         question = agent.get_next_question()
+        save_session_data(sid, session_data)
 
         if question is None:
             return jsonify({"message": "Interview completed."})
@@ -139,7 +173,8 @@ def next_question():
 def submit_answer():
 
     sid = get_session_id()
-    agent = sessions.get(sid, {}).get("agent")
+    session_data = get_session_data(sid)
+    agent = session_data.get("agent")
 
     if agent is None:
         return jsonify({"error": "Interview has not been started."}), 400
@@ -150,21 +185,32 @@ def submit_answer():
     if answer == "":
         return jsonify({"error": "Answer cannot be empty."}), 400
 
-    result = agent.submit_answer(answer)
-    return jsonify(result)
+    try:
+        result = agent.submit_answer(answer)
+        save_session_data(sid, session_data)
+        return jsonify(result)
+    except Exception as e:
+        print(f"[submit_answer] Error: {e}")
+        return jsonify({"error": f"Failed to submit answer: {str(e)}"}), 500
 
 
 @app.get("/report")
 def report():
 
     sid = get_session_id()
-    agent = sessions.get(sid, {}).get("agent")
+    session_data = get_session_data(sid)
+    agent = session_data.get("agent")
 
     if agent is None:
         return jsonify({"error": "Interview has not been started."}), 400
 
-    result = ReportGenerator(agent.state).generate()
-    return jsonify(result)
+    try:
+        result = ReportGenerator(agent.state).generate()
+        return jsonify(result)
+    except Exception as e:
+        print(f"[report] Error: {e}")
+        return jsonify({"error": f"Failed to generate report: {str(e)}"}), 500
+
 
 
 if __name__ == "__main__":
